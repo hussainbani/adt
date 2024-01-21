@@ -16,7 +16,7 @@ deployment:
   enabled: true
   image: 
     repository: hussainbani/adjustapi  
-    tag: 2024.01.21
+    tag: v2024.01.21.1
   name: adjustapi
   replicaCount: 1
    
