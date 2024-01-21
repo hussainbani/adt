@@ -64,5 +64,5 @@ jobs:
           context: .
           push: true
           tags: | 
-            hussainbani/adjustapi:latest
+            hussainbani/adjustapi:$IMAGE_TAG
 
