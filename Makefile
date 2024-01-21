@@ -9,7 +9,7 @@ test:
 	cd $(APP) && $(PYTHONV) -m pip install -r requirements.txt && $(PYTHONV) -m pytest
 
 lint:
-	cd $(APP) && $(PYTHONV) -m pip install -r requirements.txt flake8 $(APP)/api/ $(APP)/tests/ $(APP)/app.py
+	cd $(APP) && $(PYTHONV) -m pip install -r requirements.txt && flake8 $(APP)/api/ $(APP)/tests/ $(APP)/app.py
 
 bandit:
 	cd $(APP) && $(PYTHONV) -m pip install -r requirements.txt && bandit -r .
