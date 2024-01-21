@@ -21,7 +21,7 @@ For CI i have used github actions, but we can use alot of other option based on 
 - `main` branch is considered as the production branch, anything merged in that will automatically creates release and change the image tag in helm value file and create a PR for approval, merging can be automated as well but i dont like fully automation in production
 - All other branches (except main) pushed will not generate release but will run all test/build steps, while images can be used for testing in staging. (Basically for all other repos we can change the image for DEV cluster), this step is same as prod but not implemented
 - Tagging is based on the release. So it will be automated and next minor release wil be decided based on the last release
-- I have not included automated checks for Container inspect, it was a lengthy task and required me to write some custom checks /code.
+- I have included automated checks for Container inspect using Dockerscout, it will fail if critical secuirty vulnerabilities is found.
 - Codecheck is done using bandit, i have skip its failure as it would always complain on hardcoded token. Normally, here we use tooling like Sonarqube/Codacy to have a coverage report as well
 - CD will be done using ArgoCD, once we merge branch with new image, it will auto sync and start canary deployments using Argo Rollouts. I havent included that part in helmtemplate as i didnt had running argo instance on local.
 
