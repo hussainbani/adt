@@ -2,7 +2,7 @@ APP=adjustapi
 DOCKER_TARGETS=$(addsuffix .docker, $(APPS))
 DOCKER_PUSH_TARGETS=$(addsuffix .push, $(APPS))
 DOCKER_URL=hussainbani
-PYTHONV=python3.8
+PYTHONV=python3
 TAG := $(shell date +'%Y.%m.%d')
 
 test:
