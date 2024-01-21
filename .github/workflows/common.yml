@@ -72,6 +72,7 @@ jobs:
       - name: Docker Scout
         id: docker-scout
         uses: docker/scout-action@v1
+        with:
           command: cves
           image: "hussainbani/adjustapi:v2024.1.21.7"
           # image: ${{ env.DOCKER_REGISTRY }}:${{ env.IMAGE_TAG }}
