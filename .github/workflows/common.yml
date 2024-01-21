@@ -15,26 +15,26 @@ on:
         required: true
 
 jobs:
-  # code-check:
-  #   name: Running codechecks
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-go@v2
-  #       with:
-  #         python-version: 3.8
+  code-check:
+    name: Running codechecks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          python-version: 3.8
 
-  #     - name: run unit tests
-  #       run: |
-  #         make test
+      - name: run unit tests
+        run: |
+          make test
 
-  #     - name: run linter
-  #       run: |
-  #         make lint
+      - name: run linter
+        run: |
+          make lint
           
-  #     - name: Run Bandit
-  #       run: |
-  #         make bandit
+      - name: Run Bandit
+        run: |
+          make bandit
 
   build:
     name: Build and Push Image
@@ -42,8 +42,8 @@ jobs:
     env:
       IMAGE_TAG: ${{ inputs.image_tag }}
       DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
-    # needs: [code-check]
-    # if: contains(needs.*.result, 'success')
+    needs: [code-check]
+    if: contains(needs.*.result, 'success')
 
     steps:
       - name: Checkout code
