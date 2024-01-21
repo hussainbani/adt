@@ -9,6 +9,8 @@ on:
     paths-ignore:
       - "adjustapi/helm/**"
       - clusters/**
+      - '**/README.md'
+      - 'Makefile'
 
 jobs:
   build:
