@@ -1,6 +1,3 @@
-# Senior DevOps Engineer Technical Challenge
-
-
 ## Challenge Overview
 
 ## Task 1: Hello World Application
