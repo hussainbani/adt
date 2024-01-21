@@ -12,7 +12,7 @@ def check_application_status():
 class Adjustapi:
 
     def hello_world(self):
-        return {"message":"Hello World"}
+        return {"message": "Hello World"}
 
     def health_check(self):
         status = check_application_status()
