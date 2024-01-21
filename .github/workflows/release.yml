@@ -51,8 +51,8 @@ jobs:
       DOCKER_PASS:      ${{ secrets.DOCKER_PASS }}
       DOCKER_REGISTRY:  ${{ secrets.DOCKER_REGISTRY }}
 
-  update-production-yaml:
-    uses: hussainbani/adjust/.github/workflows/update-production-values.yaml@main
-    needs: [ push-release ]
-    secrets:
-      ci_github_token: ${{ secrets.CI_GITHUB_TOKEN }}
+  # update-production-yaml:
+  #   uses: hussainbani/adjust/.github/workflows/update-production-values.yaml@main
+  #   needs: [ push-release ]
+  #   secrets:
+  #     ci_github_token: ${{ secrets.CI_GITHUB_TOKEN }}
