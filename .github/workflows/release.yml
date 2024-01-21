@@ -50,6 +50,7 @@ jobs:
       DOCKER_USER:      ${{ secrets.DOCKER_USER }}
       DOCKER_PASS:      ${{ secrets.DOCKER_PASS }}
       DOCKER_REGISTRY:  ${{ secrets.DOCKER_REGISTRY }}
+      GITHUB_TOKEN:     ${{ secrets.GITHUB_TOKEN }}
 
   # update-production-yaml:
   #   uses: hussainbani/adjust/.github/workflows/update-production-values.yaml@main

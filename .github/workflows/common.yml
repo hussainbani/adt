@@ -13,6 +13,8 @@ on:
         required: true
       DOCKER_REGISTRY:
         required: true
+      GITHUB_TOKEN:
+        required: true
 
 jobs:
   # code-check:
@@ -80,4 +82,5 @@ jobs:
           #   DOCKER_REGISTRY=${{ env.DOCKER_REGISTRY }}
           only-severities: critical,high
           exit-code: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
