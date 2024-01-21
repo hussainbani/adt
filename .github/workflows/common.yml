@@ -43,7 +43,7 @@ jobs:
       IMAGE_TAG: ${{ inputs.image_tag }}
       DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
     # needs: [code-check]
-    if: contains(needs.*.result, 'success')
+    # if: contains(needs.*.result, 'success')
 
     steps:
       - name: imagename
