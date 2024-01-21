@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    {{- if .annotations }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- end }} 
+  namespace: {{ $.Values.namespace | default "default" }}
+  name:  {{ printf "%s" .Values.deployment.name }}
+  labels:
+    {{- include "adjustapi-apps.allLabels" . | nindent 4 }}
+spec:
+  rules:
+    {{- range $host :=.Values.ingress.hosts }}
+    - host: {{ $host.host }}
+      http:
+        paths:
+          {{- toYaml $host.paths | nindent 10 }}
+    {{- end }}                                                                                                                      

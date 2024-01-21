@@ -1,0 +1,36 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  namespace: {{ .Values.namespace | default "default" }}
+  name: {{ printf "%s" .Values.deployment.name }}
+  labels:
+    {{- include "adjustapi-apps.allLabels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ printf "%s" .Values.deployment.name  }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.autoscaling.external }}
+    {{- range  $externalmetrics := .Values.autoscaling.external }}
+    - external:
+        metric:
+          name: {{ $externalmetrics.name }}
+        target:
+          type: {{ $externalmetrics.type }}
+          value: {{ $externalmetrics.value }}
+      type: External
+    {{- end }}
+    {{- end }}
+    {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+          type: Utilization
+      type: Resource
+    {{- end }}
+{{- end }}

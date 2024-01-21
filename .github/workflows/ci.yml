@@ -1,0 +1,17 @@
+on:
+  push:
+    branches-ignore:
+      - "main"
+
+name: CI workflow
+
+jobs:
+  call-workflow-in-local-repo:
+    uses: ./.github/workflows/common.yml
+    with:
+      image_tag: ${{ github.sha }}
+    secrets:
+      DOCKER_USER:      ${{ secrets.DOCKER_USER }}
+      DOCKER_PASS:      ${{ secrets.DOCKER_PASS }}
+      DOCKER_REGISTRY:  ${{ secrets.DOCKER_REGISTRY }}
+  

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s" .Values.deployment.name }}-gunicorn-conf
+  namespace:  {{ .Values.namespace | default "default" }}
+  labels:
+    {{- include "adjustapi-apps.allLabels" . | nindent 4 }}
+    {{- if (.Values.configmap).additionalLabels }}
+    {{- toYaml .Values.configmap.additionalLabels | nindent 4  }}
+    {{- end }}
+data:
+  gunicorn.py: |
+    workers = 4

@@ -1,0 +1,21 @@
+{{- if .Values.serviceAccount.create -}}
+apiVersion: v1
+{{ with .Values.imagePullSecrets -}}
+imagePullSecrets:
+  {{ toYaml . | nindent 2 }}
+{{ end }}
+kind: ServiceAccount
+metadata:
+  {{- if .Values.serviceAccount.name }}
+  name: {{ .Values.serviceAccount.name }}
+  {{- else }}
+  name: {{ .Values.deployment.name }}
+  {{- end }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "adjustapi-apps.allLabels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

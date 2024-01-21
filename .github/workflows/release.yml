@@ -1,0 +1,47 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Tag and Release"
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "adjustapi/helm/**"
+
+jobs:
+  build:
+    name: "Tag and Release"
+    runs-on: "ubuntu-latest"
+    outputs:
+      tag_name: ${{ steps.generate_release_tag.outputs.next_release_tag }}
+    steps:
+      - name: "Checkout code"
+        uses: "actions/checkout@v2"
+        with:
+          fetch-depth: "0"
+
+      - name: Generate release tag
+        id: generate_release_tag
+        uses: amitsingh-007/next-release-tag@v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: 'v'
+          tag_template: 'yyyy.mm.dd.i'
+
+  push-release:
+    uses: hussainbani/adjust/.github/workflows/common.yml@main
+    needs: [ build ]
+    if: contains(needs.*.result, 'success')
+    with:
+      image_tag: ${{ needs.build.outputs.tag_name }}
+    secrets:
+      DOCKER_USER:      ${{ secrets.DOCKER_USER }}
+      DOCKER_PASS:      ${{ secrets.DOCKER_PASS }}
+      DOCKER_REGISTRY:  ${{ secrets.DOCKER_REGISTRY }}
+
+  update-production-yaml:
+    uses: hussainbani/adjust/.github/workflows/update-production-values.yaml@main
+    needs: [ push-release ]
+    secrets:
+      ci_github_token: ${{ secrets.CI_GITHUB_TOKEN }}

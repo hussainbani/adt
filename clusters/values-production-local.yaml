@@ -1,0 +1,97 @@
+# Default values for kafka-apps.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+namespace: "default"
+podSecurityContext: {}
+securityContext: {}
+
+#Specific values
+cluster_name: local
+environment: prod
+type: test
+
+imagePullSecrets: []
+
+deployment:
+  enabled: true
+  image: 
+    repository: hussainbani/adjustapi  
+    tag: 2024.01.21
+  name: adjustapi
+  replicaCount: 1
+   
+  revisionHistoryLimit: 0
+  progressDeadlineSeconds: 600
+  rollingUpdate:
+    maxSurge: 50%
+    maxUnavailable: 0
+  resources:
+    limits:
+      cpu: 250m
+      memory: 1024Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  ports: 
+    - containerPort: 8000
+      name: http
+  livenessProbe:
+    failureThreshold: 2
+    httpGet:
+      path: /health
+      port: 8000
+      scheme: HTTP
+    initialDelaySeconds: 120
+    periodSeconds: 30
+    successThreshold: 1
+    timeoutSeconds: 15
+  additionalVolumeMounts: {}
+
+ingress:
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: example.com
+      paths:
+        - backend:
+            service:
+              name: adjustapi
+              port:
+                number: 80
+          path: /app
+          pathType: ImplementationSpecific
+        - backend:
+            service:
+              name: adjustapi
+              port:
+                number: 80
+          path: /health
+          pathType: ImplementationSpecific
+
+
+service:
+ type: NodePort
+ port: 80
+ targetPort: 8000
+ protocol: TCP
+ selectorLabels:
+   app: adjustapi
+   env: prod
+
+commonLabels:
+  test: adjust
+
+additionalLabels: {}
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 50
+
+confimap:
+  additionalLabels: {}

@@ -1,0 +1,46 @@
+
+name: Update values yaml with latest release version for staging environment
+
+on:
+ workflow_call:
+  secrets:
+   ci_github_token:
+    required: true
+
+jobs:
+ replace-values:
+  runs-on: ubuntu-latest
+  steps:
+   - name: Checkout of repository
+     uses: actions/checkout@v2
+     with:
+      fetch-depth: 0
+
+   - name: Update values yaml with latest release version
+     run: |
+      sudo add-apt-repository ppa:rmescandon/yq
+      sudo apt update
+      sudo apt install yq -y
+      TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+      echo "TAG=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
+      for values_yaml in $(find clusters/ -type f -follow -print)
+        do
+          echo "Updating ${values_yaml} with tag ${TAG}"
+          CURRENT_IMAGE_TAG=$(cat "${values_yaml}" | yq e '.deployment.image.tag' - )
+          sed -i -e "s/${CURRENT_IMAGE_TAG}/${TAG}/g" ${values_yaml}
+        done
+
+   - name: Get current date and time
+     id: date
+     run: |
+      echo "DATE=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+   - name: Create Pull Request
+     id: cpr
+     uses: peter-evans/create-pull-request@v5
+     with:
+      token: ${{ secrets.ci_github_token }}
+      commit-message: updating release version to  ${{ env.TAG }}
+      branch: prod-local-${{ env.DATE }}
+      title: '[production] Release version: ${{ env.TAG }}'
+      delete-branch: true

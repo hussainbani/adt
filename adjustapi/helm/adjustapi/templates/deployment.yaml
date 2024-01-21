@@ -1,0 +1,136 @@
+{{- if .Values.deployment.enabled  }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace | default "default" }}
+  name: {{ printf "%s" .Values.deployment.name }}
+  labels:
+    {{- include "adjustapi-apps.allLabels" . | nindent 4 }}
+  {{- with  .Values.deployment.annotations }}
+  annotations:
+    {{- range $key, $value := . }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+spec:
+  progressDeadlineSeconds: {{ .Values.deployment.progressDeadlineSeconds }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.name }}
+        {{- include "adjustapi-apps.selectorLabels" . | nindent 6 }}
+  strategy:
+    rollingUpdate:
+      {{- with .Values.deployment.rollingUpdate }}
+      maxSurge: {{ .maxSurge | default "50%" }}
+      maxUnavailable: {{ .maxUnavailable | default "0" }}
+      {{- end }}
+    type: RollingUpdate
+  template:
+    metadata:
+      labels: 
+        {{- include "adjustapi-apps.allLabels" . | nindent 8 }}
+        {{- if .Values.deployment.additionalLabels }}
+        {{- toYaml .Values.deployment.additionalLabels | nindent 8  }}
+        {{- end }}
+      annotations:
+        {{- with .Values.deployment.image }}
+        image: "{{ .repository }}:{{ .tag }}"
+        {{- end }}
+        user: {{ .Values.deployment.user | default "deployer" }}
+      creationTimestamp: null
+    spec:
+      affinity:
+        {{- if .Values.deployment.nodeAffinity }}
+        nodeAffinity:
+          {{- toYaml .Values.deployment.nodeAffinity  | nindent 10 }}
+        {{- end }}
+        {{- if .Values.deployment.podAntiAffinity }}
+        podAntiAffinity:
+          {{- toYaml .Values.deployment.podAntiAffinity  | nindent 10 }}
+        {{- end }}
+      serviceAccountName: {{ template "adjustapi-apps.serviceAccountName" . }}
+      {{- if .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ printf "%s" .Values.deployment.name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- with .Values.deployment.image }}
+          image: "{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy | default "Always" }}
+          {{- end }}
+          env:
+            - name: VERSION
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['version']
+            - name: ENVIRONMENT
+              value: {{ .Values.environment }}
+            - name: CLUSTER_NAME
+              value: {{ .Values.cluster_name }}
+            - name: APPLICATION_NAME
+              value: {{ printf "%s" .Values.deployment.name }}
+            - name: APP_NAME
+              value: {{ .Values.deployment.name }}
+            {{- if .Values.deployment.additionalEnv }}
+            {{- toYaml .Values.deployment.additionalEnv | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: gunicorn-config
+              mountPath: /app/conf/gunicorn.py
+              subPath: gunicorn.py
+            {{- if (.Values.deployment).additionalVolumeMounts }}
+              {{- toYaml .Values.deployment.additionalVolumeMounts | nindent 12 }}
+            {{- end }}
+          command:
+            - gunicorn
+          args:
+            - --config 
+            - "/app/conf/gunicorn.py"
+            - "--bind" 
+            - "0.0.0.0:8000"
+            - "app:create_app()"
+          {{- if (.Values.deployment).additionalArgs }}
+            {{- toYaml .Values.deployment.additionalArgs | nindent 12 }}
+          {{- end }}
+          {{- if (.Values.deployment).readinessProbe }}
+          readinessProbe:
+            {{- toYaml .Values.deployment.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if (.Values.deployment).livenessProbe }}
+          ports:
+            {{- toYaml .Values.deployment.ports | nindent 12 }}
+          livenessProbe:
+            {{- toYaml .Values.deployment.livenessProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.deployment.resources | nindent 12 }}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          {{- if .Values.deployment.workingDir }}
+          workingDir: {{ .Values.deployment.workingDir }}
+          {{- end }}
+      dnsPolicy: {{ .Values.deployment.dnsPolicy | default "ClusterFirst" }}
+      restartPolicy: {{ .Values.deployment.restartPolicy | default "Always" }}
+      schedulerName: {{ .Values.deployment.scheduler | default "default-scheduler" }}
+      terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds | default 30 }}    
+      {{- if .Values.deployment.tolerations }}
+      tolerations:
+        {{- toYaml .Values.deployment.tolerations | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: gunicorn-config
+          configMap:
+            name: {{ printf "%s" .Values.deployment.name }}-gunicorn-conf
+            items:
+              - key: gunicorn.py
+                path: gunicorn.py
+        {{- if .Values.deployment.volumes }}
+        {{- toYaml .Values.deployment.volumes | nindent 8 }}
+        {{- end }}
+{{- end }}
