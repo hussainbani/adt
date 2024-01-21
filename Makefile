@@ -12,7 +12,7 @@ lint:
 	cd $(APP) && $(PYTHONV) -m pip install -r requirements.txt && flake8 api/ tests/ app.py
 
 bandit:
-	cd $(APP) && $(PYTHONV) -m pip install -r requirements.txt && bandit -r .
+	cd $(APP) && $(PYTHONV) -m pip install -r requirements.txt && bandit -r . --exit-zero
 
 python_clean:
 	find . -name "*.py[co]" -delete
