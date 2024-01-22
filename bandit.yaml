@@ -1,0 +1,3 @@
+skips: ['B105','B107']
+assert_used:
+  skips: ["*/test_*.py"]

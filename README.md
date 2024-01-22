@@ -1,6 +1,6 @@
 ## Challenge Overview
 
-## Task 1: Hello World Application
+## Dummy Application
 - I have used python with version 3.8, which is kind of newer and tackles security issues with libraries.
 - Requirements file is already present in repo which can be used to install libraries
 - You need a token, which is right now hardcoded in the APP (Not very viable but just for the sake of some authentication)
@@ -11,7 +11,7 @@
 - Makefile has been created to simulate test/build/push on local machine
 
 
-## Task 2: Continuous Integration
+## Continuous Integration
 For CI i have used github actions, but we can use alot of other option based on requirements.
 - Github performs almost all the basic checks. This includes automated test, linting, code checks, whithout this step things wont move forward
 - After checks have been passed, it will build and push image to docker repo, it is being configured using github secrets
@@ -32,7 +32,7 @@ DOCKER_USER
 ```
 
 
-## Task 3: Deploy application to kubernetes
+## Deployment
 In the repo there is fully developed helmchart for this application.
 - You can deploy either via helm / CD part can be done via ArgoCD
 - It assumes that you already have ingress nginx controller running and for HPA to work, you need metrics core.
